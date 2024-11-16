@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Actual - Calendario de Plantas</title>
+    <style>
+        /* Estilos CSS para stock.html */
+
+        /* Reset CSS */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+
+        header, footer {
+            background-color: #2e8b57;
+            color: white;
+            text-align: center;
+            padding: 1.5em 0;
+        }
+
+        main {
+            padding: 1em;
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+        }
+
+        /* Enlace para Volver al Calendario */
+        .back-link {
+            text-align: center;
+            margin-bottom: 1em;
+        }
+
+        .back-link a {
+            text-decoration: none;
+            background-color: #2e8b57;
+            color: white;
+            padding: 0.75em 1.5em;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .back-link a:hover {
+            background-color: #246b45;
+        }
+
+        /* Stock Actual */
+        .stock-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stock-header h2 {
+            color: #2e8b57;
+        }
+
+        .add-seed-button {
+            background-color: #2e8b57;
+            color: white;
+            border: none;
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            transition: background-color 0.3s;
+        }
+
+        .add-seed-button:hover {
+            background-color: #246b45;
+        }
+
+        /* Ocultar el input de archivo real */
+        #seed-image {
+            display: none;
+        }
+
+        /* Botón personalizado para añadir imagen */
+        .custom-file-upload {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #2e8b57;
+            color: white;
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1em;
+            margin: 0 auto; /* Centrar el botón */
+            width: fit-content;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #246b45;
+        }
+
+        /* Vista Previa de las Imágenes */
+        .image-preview {
+            display: none; /* Oculto por defecto */
+            flex-direction: column;
+            align-items: center;
+            margin-top: 1em;
+            width: 100%;
+        }
+
+        .image-preview p {
+            margin-bottom: 0.5em;
+            font-weight: bold;
+        }
+
+        .image-preview #preview-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .image-preview .preview-image-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .image-preview .preview-image-container img {
+            max-width: 150px; /* Aumentado para mejor visibilidad */
+            max-height: 150px;
+            border: 2px solid #2e8b57;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .image-preview .preview-image-container img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Nueva Estilización para la "X" que Cubre la Imagen */
+        .image-preview .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 50%;
+            pointer-events: none; /* Permitir clics en la imagen */
+        }
+
+        .image-preview .preview-image-container:hover .remove-image {
+            opacity: 1;
+            pointer-events: all; /* Habilitar clics cuando está visible */
+            cursor: pointer;
+        }
+
+        /* Lista de Semillas */
+        .seed-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+        }
+
+        .seed-item {
+            background-color: white;
+            padding: 1em;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 1em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .seed-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+        }
+
+        .seed-images img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .seed-images img:hover {
+            transform: scale(1.05);
+        }
+
+        .seed-details {
+            flex: 1;
+        }
+
+        .seed-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2e8b57;
+            margin-bottom: 0.5em;
+        }
+
+        .seed-seasons {
+            display: flex;
+            gap: 0.5em;
+        }
+
+        .season {
+            display: flex;
+            align-items: center;
+            gap: 0.25em;
+            font-size: 0.9em;
+        }
+
+        /* Símbolos de Temporada */
+        .season-icon {
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* Primavera: Flor */
+        .primavera {
+            background-image: url('https://openmoji.org/data/color/svg/1F33C.svg');
+        }
+
+        /* Verano: Sol */
+        .verano {
+            background-image: url('https://openmoji.org/data/color/svg/2600.svg');
+        }
+
+        /* Otoño: Hoja */
+        .otono { /* Cambiado de .otoño a .otono */
+            background-image: url('https://openmoji.org/data/color/svg/1F343.svg');
+        }
+
+        /* Invierno: Copo de nieve */
+        .invierno {
+            background-image: url('https://openmoji.org/data/color/svg/2744.svg');
+        }
+
+        /* Botones de Acción */
+        .action-buttons {
+            display: flex;
+            gap: 0.5em;
+        }
+
+        .action-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            color: #2e8b57;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.25em;
+        }
+
+        .action-button svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .action-button:hover {
+            color: #246b45;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1em;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2em;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-content h3 {
+            margin-bottom: 1em;
+            color: #2e8b57;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+        }
+
+        .modal-form label {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .modal-form input[type="text"],
+        .modal-form select,
+        .modal-form input[type="file"] {
+            padding: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .modal-form .season-options {
+            display: flex;
+            gap: 1em;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .modal-form .season-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .modal-form .season-option input {
+            display: none;
+        }
+
+        .modal-form .season-option .season-icon {
+            border: 2px solid transparent;
+            border-radius: 50%;
+            padding: 0.5em;
+            background-color: #e0f7fa;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        .modal-form .season-option input:checked + .season-icon {
+            border-color: #2e8b57;
+            background-color: #b2dfdb;
+        }
+
+        .modal-form .season-option:hover {
+            transform: scale(1.1);
+        }
+
+        .modal-form button {
+            background-color: #2e8b57;
+            color: white;
+            border: none;
+            padding: 0.75em;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        .modal-form button:hover {
+            background-color: #246b45;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            main {
+                padding: 0.5em;
+            }
+
+            .seed-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .seed-images {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .action-buttons {
+                position: absolute;
+                top: 1em;
+                right: 1em;
+            }
+        }
+
+        /* Custom Alert and Confirm Modals */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1em;
+            z-index: 2000;
+        }
+
+        .custom-modal.active {
+            display: flex;
+        }
+
+        .custom-modal-content {
+            background-color: white;
+            padding: 1.5em;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .custom-modal-content p {
+            margin-bottom: 1.5em;
+        }
+
+        .custom-modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5em;
+        }
+
+        .custom-modal-buttons button {
+            padding: 0.5em 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .btn-confirm {
+            background-color: #2e8b57;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background-color: #246b45;
+        }
+
+        .btn-cancel {
+            background-color: #ccc;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background-color: #aaa;
+        }
+
+        /* Image Modal */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1em;
+            z-index: 3000;
+        }
+
+        .image-modal.active {
+            display: flex;
+        }
+
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            animation: zoomIn 0.3s ease-in-out;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Ajustes para los nuevos SVG */
+        .size-6 {
+            width: 24px;
+            height: 24px;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Stock Actual</h1>
+    </header>
+    <main>
+        <!-- Enlace para Volver al Calendario -->
+        <div class="back-link">
+            <a href="index.html">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z"/>
+                </svg>
+                Volver al Calendario
+            </a>
+        </div>
+
+        <!-- Contenedor de Stock Actual -->
+        <div class="stock-container">
+            <div class="stock-header">
+                <h2>Mis Semillas</h2>
+                <button class="add-seed-button" id="add-seed-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Añadir Semilla
+                </button>
+            </div>
+            <div class="seed-list" id="seed-list">
+                <!-- Las semillas se agregarán aquí dinámicamente -->
+            </div>
+        </div>
+    </main>
+    <footer>
+        &copy; 2024 Calendario de Plantas <!-- Año actualizado a 2024 -->
+    </footer>
+
+    <!-- Modal para Añadir/Editar Semilla -->
+    <div class="modal" id="seed-modal">
+        <div class="modal-content">
+            <button class="close-modal" id="close-modal">&times;</button>
+            <h3 id="modal-title">Añadir Semilla</h3>
+            <form id="seed-form" class="modal-form">
+                <label for="seed-name">Nombre de la Semilla:</label>
+                <input type="text" id="seed-name" name="seed-name" required>
+
+                <label for="seed-image">
+                    <span class="custom-file-upload">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
+                        </svg>
+                        Subir Imagen
+                    </span>
+                    <!-- Se añade el atributo 'multiple' para permitir múltiples archivos -->
+                    <input type="file" id="seed-image" name="seed-image" accept="image/*" multiple>
+                </label>
+
+                <!-- Vista Previa de las Imágenes -->
+                <div class="image-preview" id="image-preview">
+                    <p>Vista Previa:</p>
+                    <div id="preview-images"></div>
+                </div>
+
+                <label>Temporadas:</label>
+                <div class="season-options">
+                    <label class="season-option">
+                        <input type="checkbox" name="seasons" value="primavera">
+                        <span class="season-icon primavera" title="Primavera"></span>
+                        Primavera
+                    </label>
+                    <label class="season-option">
+                        <input type="checkbox" name="seasons" value="verano">
+                        <span class="season-icon verano" title="Verano"></span>
+                        Verano
+                    </label>
+                    <label class="season-option">
+                        <input type="checkbox" name="seasons" value="otono"> <!-- Valor cambiado de "otoño" a "otono" -->
+                        <span class="season-icon otono" title="Otoño"></span> <!-- Clase cambiada de "otoño" a "otono" -->
+                        Otoño
+                    </label>
+                    <label class="season-option">
+                        <input type="checkbox" name="seasons" value="invierno">
+                        <span class="season-icon invierno" title="Invierno"></span>
+                        Invierno
+                    </label>
+                </div>
+
+                <button type="submit" id="save-seed-button">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div class="custom-modal" id="custom-alert">
+        <div class="custom-modal-content">
+            <p id="custom-alert-message">Mensaje de alerta</p>
+            <div class="custom-modal-buttons">
+                <button class="btn-confirm" id="alert-ok">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal -->
+    <div class="custom-modal" id="custom-confirm">
+        <div class="custom-modal-content">
+            <p id="custom-confirm-message">Mensaje de confirmación</p>
+            <div class="custom-modal-buttons">
+                <button class="btn-confirm" id="confirm-yes">Sí</button>
+                <button class="btn-cancel" id="confirm-no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div class="image-modal" id="image-modal">
+        <img src="" alt="Imagen Completa" id="full-image">
+    </div>
+
+    <script>
+        // Código JavaScript para stock.html
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const seedListEl = document.getElementById('seed-list');
+            const addSeedButton = document.getElementById('add-seed-button');
+            const seedModal = document.getElementById('seed-modal');
+            const closeModalButton = document.getElementById('close-modal');
+            const seedForm = document.getElementById('seed-form');
+            const modalTitle = document.getElementById('modal-title');
+            const seedImageInput = document.getElementById('seed-image');
+            const imagePreviewContainer = document.getElementById('image-preview');
+            const previewImagesContainer = document.getElementById('preview-images');
+
+            const customAlert = document.getElementById('custom-alert');
+            const alertMessage = document.getElementById('custom-alert-message');
+            const alertOkButton = document.getElementById('alert-ok');
+
+            const customConfirm = document.getElementById('custom-confirm');
+            const confirmMessage = document.getElementById('custom-confirm-message');
+            const confirmYesButton = document.getElementById('confirm-yes');
+            const confirmNoButton = document.getElementById('confirm-no');
+
+            const imageModal = document.getElementById('image-modal');
+            const fullImage = document.getElementById('full-image');
+
+            let seeds = [];
+            let confirmCallback = null;
+
+            // Arreglo para manejar las imágenes en el modal
+            let currentImages = [];
+
+            // Cargar semillas desde localStorage
+            function loadSeeds() {
+                try {
+                    seeds = JSON.parse(localStorage.getItem('seedStock')) || [];
+                    console.log('Semillas cargadas:', seeds);
+                } catch (e) {
+                    console.error('Error al cargar las semillas desde localStorage', e);
+                    seeds = [];
+                }
+            }
+
+            // Guardar semillas en localStorage
+            function saveSeeds() {
+                try {
+                    localStorage.setItem('seedStock', JSON.stringify(seeds));
+                    console.log('Semillas guardadas:', seeds);
+                } catch (e) {
+                    console.error('Error al guardar las semillas en localStorage', e);
+                    showAlert('Error al guardar las semillas. Por favor, intenta nuevamente.');
+                }
+            }
+
+            // Renderizar la lista de semillas
+            function renderSeeds() {
+                seedListEl.innerHTML = '';
+
+                if (seeds.length === 0) {
+                    seedListEl.innerHTML = '<p>No hay semillas añadidas. ¡Añade algunas!</p>';
+                    return;
+                }
+
+                seeds.forEach((seed, index) => {
+                    const seedItem = document.createElement('div');
+                    seedItem.classList.add('seed-item');
+
+                    // Contenedor de imágenes de la semilla
+                    if (seed.images && seed.images.length > 0) {
+                        const imagesContainer = document.createElement('div');
+                        imagesContainer.classList.add('seed-images');
+
+                        seed.images.forEach((imgSrc) => {
+                            const img = document.createElement('img');
+                            img.src = imgSrc;
+                            img.alt = seed.name;
+                            img.addEventListener('click', () => openImageModal(imgSrc));
+                            imagesContainer.appendChild(img);
+                        });
+
+                        seedItem.appendChild(imagesContainer);
+                    }
+
+                    // Detalles de la semilla
+                    const details = document.createElement('div');
+                    details.classList.add('seed-details');
+
+                    const name = document.createElement('div');
+                    name.classList.add('seed-name');
+                    name.textContent = seed.name;
+
+                    const seasons = document.createElement('div');
+                    seasons.classList.add('seed-seasons');
+
+                    seed.seasons.forEach(season => {
+                        const seasonEl = document.createElement('div');
+                        seasonEl.classList.add('season');
+
+                        const icon = document.createElement('span');
+                        icon.classList.add('season-icon', season);
+                        icon.title = capitalizeFirstLetter(season);
+                        seasonEl.appendChild(icon);
+
+                        const text = document.createElement('span');
+                        text.textContent = capitalizeFirstLetter(season);
+                        seasonEl.appendChild(text);
+
+                        seasons.appendChild(seasonEl);
+                    });
+
+                    details.appendChild(name);
+                    details.appendChild(seasons);
+
+                    // Botones de acción
+                    const actionButtons = document.createElement('div');
+                    actionButtons.classList.add('action-buttons');
+
+                    // Botón de editar (Lápiz)
+                    const editButton = document.createElement('button');
+                    editButton.classList.add('action-button');
+                    editButton.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                        </svg>
+                    `;
+                    editButton.title = 'Editar Semilla';
+                    editButton.addEventListener('click', () => openEditModal(index));
+
+                    // Botón de eliminar (Basura)
+                    const deleteButton = document.createElement('button');
+                    deleteButton.classList.add('action-button');
+                    deleteButton.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                        </svg>
+                    `;
+                    deleteButton.title = 'Eliminar Semilla';
+                    deleteButton.addEventListener('click', () => openDeleteConfirm(index));
+
+                    actionButtons.appendChild(editButton);
+                    actionButtons.appendChild(deleteButton);
+
+                    seedItem.appendChild(details);
+                    seedItem.appendChild(actionButtons);
+
+                    seedListEl.appendChild(seedItem);
+                });
+            }
+
+            // Capitalizar la primera letra
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+
+            // Abrir el modal para añadir una semilla
+            function openAddModal() {
+                console.log('Abriendo modal para añadir una semilla');
+                seedForm.reset();
+                modalTitle.textContent = 'Añadir Semilla';
+                seedModal.classList.add('active');
+                seedForm.dataset.editIndex = '-1'; // Establecer a -1 para indicar 'añadir'
+                currentImages = [];
+                renderImagePreview();
+                // Resetear las temporadas seleccionadas
+                document.querySelectorAll('input[name="seasons"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+
+            // Abrir el modal para editar una semilla
+            function openEditModal(index) {
+                console.log('Abriendo modal para editar la semilla en índice:', index);
+                const seed = seeds[index];
+                seedForm.reset();
+                modalTitle.textContent = 'Editar Semilla';
+                document.getElementById('seed-name').value = seed.name;
+                // Marcar las temporadas correspondientes
+                document.querySelectorAll('input[name="seasons"]').forEach(checkbox => {
+                    checkbox.checked = seed.seasons.includes(checkbox.value);
+                });
+                seedForm.dataset.editIndex = index.toString(); // Establecer el índice para editar
+                seedModal.classList.add('active');
+
+                // Establecer las imágenes actuales
+                currentImages = seed.images ? [...seed.images] : [];
+                renderImagePreview();
+            }
+
+            // Cerrar el modal
+            function closeModal() {
+                console.log('Cerrando modal');
+                seedModal.classList.remove('active');
+                hideImagePreview();
+            }
+
+            // Mostrar alerta personalizada
+            function showAlert(message) {
+                console.log('Mostrando alerta:', message);
+                alertMessage.textContent = message;
+                customAlert.classList.add('active');
+            }
+
+            // Ocultar alerta personalizada
+            function hideAlert() {
+                console.log('Ocultando alerta');
+                customAlert.classList.remove('active');
+            }
+
+            // Mostrar confirmación personalizada
+            function showConfirm(message, callback) {
+                console.log('Mostrando confirmación:', message);
+                confirmMessage.textContent = message;
+                customConfirm.classList.add('active');
+                confirmCallback = callback;
+            }
+
+            // Ocultar confirmación personalizada
+            function hideConfirm() {
+                console.log('Ocultando confirmación');
+                customConfirm.classList.remove('active');
+                confirmCallback = null;
+            }
+
+            // Abrir el modal de imagen
+            function openImageModal(src) {
+                console.log('Abriendo modal de imagen:', src);
+                fullImage.src = src;
+                imageModal.classList.add('active');
+            }
+
+            // Cerrar el modal de imagen
+            function closeImageModal() {
+                console.log('Cerrando modal de imagen');
+                imageModal.classList.remove('active');
+                fullImage.src = '';
+            }
+
+            // Eliminar una semilla
+            function deleteSeed(index) {
+                console.log('Eliminando semilla en índice:', index);
+                seeds.splice(index, 1);
+                saveSeeds();
+                renderSeeds();
+            }
+
+            // Confirmación antes de eliminar
+            function openDeleteConfirm(index) {
+                console.log('Abriendo confirmación de eliminación para índice:', index);
+                showConfirm('¿Estás seguro de que deseas eliminar esta semilla?', () => {
+                    deleteSeed(index);
+                    hideConfirm();
+                });
+            }
+
+            // Mostrar vista previa de las imágenes
+            function renderImagePreview() {
+                console.log('Renderizando vista previa de imágenes');
+                if (currentImages.length > 0) {
+                    imagePreviewContainer.style.display = 'flex'; // Cambiado de 'block' a 'flex'
+                } else {
+                    imagePreviewContainer.style.display = 'none';
+                }
+
+                previewImagesContainer.innerHTML = '';
+                currentImages.forEach((imgSrc, index) => {
+                    const container = document.createElement('div');
+                    container.classList.add('preview-image-container');
+
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    img.alt = `Imagen ${index + 1}`;
+                    img.addEventListener('click', () => openImageModal(imgSrc));
+                    container.appendChild(img);
+
+                    const removeBtn = document.createElement('button');
+                    removeBtn.classList.add('remove-image');
+                    removeBtn.innerHTML = '&times;';
+                    removeBtn.title = 'Eliminar imagen';
+                    removeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Evita que se abra el modal de la imagen
+                        removeImage(index);
+                    });
+                    container.appendChild(removeBtn);
+
+                    previewImagesContainer.appendChild(container);
+                });
+            }
+
+            // Eliminar una imagen de la vista previa
+            function removeImage(index) {
+                console.log('Eliminando imagen en índice:', index);
+                currentImages.splice(index, 1);
+                renderImagePreview();
+            }
+
+            // Ocultar vista previa de las imágenes
+            function hideImagePreview() {
+                console.log('Ocultando vista previa de imágenes');
+                previewImagesContainer.innerHTML = '';
+                imagePreviewContainer.style.display = 'none';
+            }
+
+            // Manejar el envío del formulario
+            seedForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                console.log('Formulario enviado');
+                const name = document.getElementById('seed-name').value.trim();
+                const selectedSeasons = Array.from(document.querySelectorAll('input[name="seasons"]:checked')).map(cb => cb.value);
+
+                if (selectedSeasons.length === 0) {
+                    showAlert('Por favor, selecciona al menos una temporada.');
+                    return;
+                }
+
+                // Validar que el nombre no esté vacío
+                if (name === '') {
+                    showAlert('Por favor, ingresa el nombre de la semilla.');
+                    return;
+                }
+
+                // Guardar la semilla (añadir o editar)
+                saveSeed(name, currentImages, selectedSeasons);
+            });
+
+            // Guardar la semilla (añadir o editar)
+            function saveSeed(name, images, seasons) {
+                console.log('Guardando semilla:', { name, images, seasons });
+                const editIndex = seedForm.dataset.editIndex;
+                if (editIndex === '-1') {
+                    // Añadir nueva semilla
+                    seeds.push({ name, images, seasons });
+                    console.log('Semilla añadida');
+                } else {
+                    const index = parseInt(editIndex, 10);
+                    if (!isNaN(index) && index >= 0 && index < seeds.length) {
+                        // Editar semilla existente
+                        seeds[index].name = name;
+                        seeds[index].images = images; // Actualizar las imágenes
+                        seeds[index].seasons = seasons;
+                        console.log('Semilla editada en índice:', index);
+                    } else {
+                        console.error('Índice de edición inválido:', editIndex);
+                        showAlert('Error al editar la semilla. Por favor, intenta nuevamente.');
+                        return; // Evita cerrar el modal si hay un error
+                    }
+                }
+                saveSeeds();
+                renderSeeds();
+                closeModal();
+            }
+
+            // Cerrar el modal al hacer clic en el botón de cerrar
+            closeModalButton.addEventListener('click', closeModal);
+
+            // Abrir el modal al hacer clic en el botón de añadir semilla
+            addSeedButton.addEventListener('click', openAddModal);
+
+            // Mostrar vista previa al seleccionar imágenes
+            seedImageInput.addEventListener('change', (e) => {
+                console.log('Seleccionadas imágenes:', e.target.files);
+                const files = e.target.files;
+                if (files && files.length > 0) {
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            currentImages.push(event.target.result);
+                            renderImagePreview();
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                }
+                // Reiniciar el input para permitir seleccionar las mismas imágenes nuevamente si se desea
+                seedImageInput.value = '';
+            });
+
+            // Cerrar los modales al hacer clic fuera del contenido
+            window.addEventListener('click', (e) => {
+                if (e.target === seedModal) {
+                    closeModal();
+                }
+                if (e.target === customAlert) {
+                    hideAlert();
+                }
+                if (e.target === customConfirm) {
+                    hideConfirm();
+                }
+                if (e.target === imageModal) {
+                    closeImageModal();
+                }
+            });
+
+            // Manejar el botón de aceptar en la alerta
+            alertOkButton.addEventListener('click', hideAlert);
+
+            // Manejar los botones de confirmación
+            confirmYesButton.addEventListener('click', () => {
+                if (confirmCallback) confirmCallback();
+            });
+
+            confirmNoButton.addEventListener('click', hideConfirm);
+
+            // Manejar el cierre del modal de imagen
+            imageModal.addEventListener('click', closeImageModal);
+
+            // Inicializar
+            loadSeeds();
+            renderSeeds();
+        });
+    </script>
+</body>
+</html>
+

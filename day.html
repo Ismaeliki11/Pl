@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Meta tag para diseño responsivo -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registros del Día - Calendario de Plantas</title>
+    <style>
+        /* Variables CSS para colores */
+        :root {
+            --primary-color: #2e8b57;
+            --secondary-color: #f0f8ff;
+            --text-color: #333;
+            --background-color: #fff;
+            --highlight-color: #ff6347;
+            --modal-background: rgba(0, 0, 0, 0.8);
+            --button-hover-color: #246b45;
+        }
+
+        /* Reset CSS mejorado */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        header, footer {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1.5em 0;
+        }
+
+        main {
+            padding: 1em;
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+        }
+
+        /* Botón para volver al calendario */
+        #back-to-calendar {
+            text-align: center;
+            margin-bottom: 1em;
+        }
+
+        #back-to-calendar button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75em 1.5em;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            border: none;
+            cursor: pointer;
+        }
+
+        #back-to-calendar button:hover {
+            background-color: var(--button-hover-color);
+        }
+
+        /* Vista de Registros del Día */
+        #day-view h2 {
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 1.8em;
+        }
+
+        .records {
+            margin-bottom: 1em;
+            display: flex;
+            flex-direction: column;
+            gap: 1em;
+        }
+
+        .record {
+            background-color: var(--background-color);
+            padding: 1em;
+            border-radius: 8px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+        }
+
+        .record-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: var(--primary-color);
+        }
+
+        .record-description {
+            font-size: 1em;
+            color: #555;
+        }
+
+        .record-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+        }
+
+        .record-images img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .record-images img:hover {
+            transform: scale(1.05);
+        }
+
+        .record-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 0.5em;
+        }
+
+        .record-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5em; /* Aumentado para mejor visibilidad */
+            color: #555;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .record-actions button:hover,
+        .record-actions button:focus {
+            color: var(--primary-color);
+            outline: none;
+        }
+
+        /* Definición de la clase size-6 */
+        .size-6 {
+            width: 24px; /* Ajusta el tamaño según sea necesario */
+            height: 24px; /* Ajusta el tamaño según sea necesario */
+        }
+
+        /* Formulario */
+        #record-form-container {
+            background-color: var(--background-color);
+            padding: 1.5em;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #record-form-container h3 {
+            margin-bottom: 1em;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        #record-form label {
+            display: block;
+            margin-top: 1em;
+            font-weight: bold;
+        }
+
+        #record-form input,
+        #record-form textarea {
+            width: 100%;
+            padding: 0.75em;
+            margin-top: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        #record-form textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        #record-form input[type="file"] {
+            display: none;
+        }
+
+        #record-form .custom-file-upload {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1em;
+            margin-top: 0.5em;
+            width: fit-content;
+        }
+
+        #record-form .custom-file-upload:hover {
+            background-color: var(--button-hover-color);
+        }
+
+        /* Vista Previa de Imágenes */
+        .image-preview {
+            display: none;
+            margin-top: 1em;
+            text-align: center;
+        }
+
+        .image-preview p {
+            margin-bottom: 0.5em;
+            font-weight: bold;
+        }
+
+        .image-preview #preview-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+            justify-content: center;
+        }
+
+        .image-preview .preview-image-container {
+            position: relative;
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+        }
+
+        .image-preview .preview-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .image-preview .preview-image-container img:hover {
+            transform: scale(1.05);
+        }
+
+        .image-preview .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .image-preview .preview-image-container:hover .remove-image {
+            opacity: 1;
+        }
+
+        #record-form button {
+            margin-top: 1em;
+            padding: 0.75em 1.5em;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            display: block;
+            width: 100%;
+        }
+
+        #record-form button:hover,
+        #record-form button:focus {
+            background-color: var(--button-hover-color);
+            outline: none;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1em;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2em;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-content h3 {
+            margin-bottom: 1em;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #333;
+        }
+
+        /* Custom Alert and Confirm Modals */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1em;
+            z-index: 2000;
+        }
+
+        .custom-modal.active {
+            display: flex;
+        }
+
+        .custom-modal-content {
+            background-color: white;
+            padding: 1.5em;
+            border-radius: 8px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .custom-modal-content p {
+            margin-bottom: 1.5em;
+            text-align: center;
+        }
+
+        .custom-modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5em;
+        }
+
+        .custom-modal-buttons button {
+            padding: 0.5em 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .btn-confirm {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background-color: var(--button-hover-color);
+        }
+
+        .btn-cancel {
+            background-color: #ccc;
+            color: #333;
+        }
+
+        .btn-cancel:hover {
+            background-color: #aaa;
+        }
+
+        /* Image Modal */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-background);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1em;
+            z-index: 3000;
+        }
+
+        .image-modal.active {
+            display: flex;
+        }
+
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            animation: zoomIn 0.3s ease-in-out;
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .record {
+                padding: 0.75em;
+            }
+
+            #record-form button {
+                padding: 0.5em 1em;
+            }
+
+            .image-preview .preview-image-container {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #record-form input, #record-form textarea {
+                font-size: 0.9em;
+            }
+
+            .record-title {
+                font-size: 1em;
+            }
+
+            .record-description {
+                font-size: 0.9em;
+            }
+
+            #record-form button {
+                font-size: 0.9em;
+            }
+
+            .image-preview .preview-image-container {
+                width: 60px;
+                height: 60px;
+            }
+
+            .image-preview .remove-image {
+                width: 20px;
+                height: 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Registros del Día</h1>
+    </header>
+    <main>
+        <div id="back-to-calendar">
+            <button type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left size-6" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z"/>
+                </svg>
+                Volver al Calendario
+            </button>
+        </div>
+        <div id="day-view">
+            <h2 id="day-view-date">Fecha Seleccionada</h2>
+
+            <!-- Lista de Registros -->
+            <div class="records" id="records-list">
+                <!-- Registros dinámicos -->
+            </div>
+
+            <!-- Formulario para Añadir/Editar Registros -->
+            <div id="record-form-container">
+                <h3 id="form-title">Añadir Registro</h3>
+                <form id="record-form">
+                    <label for="record-title">Título del registro</label>
+                    <input type="text" id="record-title" name="title" placeholder="Título del registro" required>
+
+                    <label for="record-description">Descripción del registro (Opcional)</label>
+                    <textarea id="record-description" name="description" placeholder="Descripción del registro"></textarea>
+
+                    <label for="record-images">
+                        <span class="custom-file-upload">
+                            <!-- Icono de Subir Imagen Actualizado -->
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15m0-3-3-3m0 0-3 3m3-3V15" />
+                            </svg>
+                            Subir Imágenes
+                        </span>
+                        <input type="file" id="record-images" name="images" accept="image/*" multiple>
+                    </label>
+
+                    <!-- Vista Previa de las Imágenes -->
+                    <div class="image-preview" id="image-preview">
+                        <p>Vista Previa:</p>
+                        <div id="preview-images"></div>
+                    </div>
+
+                    <button type="submit" id="save-record-btn">Guardar Registro</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    <footer>
+        &copy; 2023 Calendario de Plantas
+    </footer>
+
+    <!-- Modal para Ver Imagen Completa -->
+    <div class="image-modal" id="image-modal">
+        <img src="" alt="Imagen Completa" id="full-image">
+    </div>
+
+    <!-- Custom Alert Modal -->
+    <div class="custom-modal" id="custom-alert">
+        <div class="custom-modal-content">
+            <p id="custom-alert-message">Mensaje de alerta</p>
+            <div class="custom-modal-buttons">
+                <button class="btn-confirm" id="alert-ok">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal -->
+    <div class="custom-modal" id="custom-confirm">
+        <div class="custom-modal-content">
+            <p id="custom-confirm-message">Mensaje de confirmación</p>
+            <div class="custom-modal-buttons">
+                <button class="btn-confirm" id="confirm-yes">Sí</button>
+                <button class="btn-cancel" id="confirm-no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Mejorado -->
+    <script defer>
+        (function() {
+            'use strict';
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const selectedDate = urlParams.get('date');
+
+                const dayViewDateEl = document.getElementById('day-view-date');
+                const backToCalendarBtn = document.getElementById('back-to-calendar').querySelector('button');
+                const recordsListEl = document.getElementById('records-list');
+                const formTitleEl = document.getElementById('form-title');
+                const recordTitleInput = document.getElementById('record-title');
+                const recordDescriptionInput = document.getElementById('record-description');
+                const recordImagesInput = document.getElementById('record-images');
+                const recordForm = document.getElementById('record-form');
+                const imagePreviewContainer = document.getElementById('image-preview');
+                const previewImagesContainer = document.getElementById('preview-images');
+
+                const customAlert = document.getElementById('custom-alert');
+                const alertMessage = document.getElementById('custom-alert-message');
+                const alertOkButton = document.getElementById('alert-ok');
+
+                const customConfirm = document.getElementById('custom-confirm');
+                const confirmMessage = document.getElementById('custom-confirm-message');
+                const confirmYesButton = document.getElementById('confirm-yes');
+                const confirmNoButton = document.getElementById('confirm-no');
+
+                const imageModal = document.getElementById('image-modal');
+                const fullImage = document.getElementById('full-image');
+
+                let editRecordId = null;
+                let records;
+
+                let currentImages = [];
+
+                // Cargar registros desde localStorage
+                function loadRecords() {
+                    try {
+                        records = JSON.parse(localStorage.getItem('plantRecords')) || [];
+                    } catch (e) {
+                        console.error('Error al cargar plantRecords desde localStorage', e);
+                        records = [];
+                    }
+                }
+
+                // Guardar registros en localStorage
+                function saveRecords() {
+                    try {
+                        localStorage.setItem('plantRecords', JSON.stringify(records));
+                    } catch (e) {
+                        console.error('Error al guardar plantRecords en localStorage', e);
+                        showAlert('Error al guardar el registro.');
+                    }
+                }
+
+                // Renderizar los registros del día
+                function renderRecords() {
+                    recordsListEl.innerHTML = '';
+                    const dayRecords = records.filter(record => record.date === selectedDate);
+
+                    if (dayRecords.length === 0) {
+                        recordsListEl.innerHTML = '<p>No hay registros para este día.</p>';
+                        return;
+                    }
+
+                    dayRecords.forEach(record => {
+                        const recordEl = document.createElement('div');
+                        recordEl.classList.add('record');
+
+                        // Crear y agregar el título primero
+                        const titleEl = document.createElement('div');
+                        titleEl.classList.add('record-title');
+                        titleEl.textContent = record.title;
+                        recordEl.appendChild(titleEl);
+
+                        // Descripción opcional
+                        if (record.description && record.description.trim() !== '') {
+                            const descriptionEl = document.createElement('div');
+                            descriptionEl.classList.add('record-description');
+                            descriptionEl.textContent = record.description;
+                            recordEl.appendChild(descriptionEl);
+                        }
+
+                        // Imágenes del registro
+                        if (record.images && record.images.length > 0) {
+                            const imagesContainer = document.createElement('div');
+                            imagesContainer.classList.add('record-images');
+
+                            record.images.forEach(imgSrc => {
+                                const img = document.createElement('img');
+                                img.src = imgSrc;
+                                img.alt = record.title;
+                                img.addEventListener('click', () => openImageModal(imgSrc));
+                                imagesContainer.appendChild(img);
+                            });
+
+                            recordEl.appendChild(imagesContainer);
+                        }
+
+                        const actionsEl = document.createElement('div');
+                        actionsEl.classList.add('record-actions');
+
+                        // Icono de Editar (Lápiz)
+                        const editBtn = document.createElement('button');
+                        editBtn.setAttribute('type', 'button');
+                        editBtn.setAttribute('aria-label', 'Editar registro');
+                        editBtn.classList.add('edit-btn');
+                        editBtn.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                            </svg>
+                        `;
+                        editBtn.addEventListener('click', () => {
+                            editRecord(record.id);
+                            scrollToForm();
+                        });
+
+                        // Icono de Borrar (Basura)
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.setAttribute('type', 'button');
+                        deleteBtn.setAttribute('aria-label', 'Eliminar registro');
+                        deleteBtn.classList.add('delete-btn');
+                        deleteBtn.innerHTML = `
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                            </svg>
+                        `;
+                        deleteBtn.addEventListener('click', () => confirmDeleteRecord(record.id));
+
+                        actionsEl.appendChild(editBtn);
+                        actionsEl.appendChild(deleteBtn);
+
+                        recordEl.appendChild(actionsEl);
+
+                        recordsListEl.appendChild(recordEl);
+                    });
+                }
+
+                // Desplazar la vista hacia el formulario
+                function scrollToForm() {
+                    const formContainer = document.getElementById('record-form-container');
+                    formContainer.scrollIntoView({ behavior: 'smooth' });
+                }
+
+                // Guardar el registro (añadir o editar)
+                function saveRecord(event) {
+                    event.preventDefault();
+                    const title = recordTitleInput.value.trim();
+                    const description = recordDescriptionInput.value.trim();
+
+                    if (title === '') {
+                        showAlert('Por favor, completa el título del registro.');
+                        return;
+                    }
+
+                    if (editRecordId) {
+                        const recordIndex = records.findIndex(record => record.id === editRecordId);
+                        if (recordIndex !== -1) {
+                            records[recordIndex].title = title;
+                            records[recordIndex].description = description; // Actualizar descripción
+                            records[recordIndex].images = [...currentImages];
+                        }
+                    } else {
+                        const newRecord = {
+                            id: generateId(),
+                            date: selectedDate,
+                            title,
+                            description, // Incluir descripción
+                            images: [...currentImages]
+                        };
+                        records.push(newRecord);
+                    }
+
+                    saveRecords();
+                    renderRecords();
+                    resetForm();
+                }
+
+                // Editar un registro
+                function editRecord(id) {
+                    const record = records.find(record => record.id === id);
+                    if (record) {
+                        recordTitleInput.value = record.title;
+                        recordDescriptionInput.value = record.description;
+                        formTitleEl.textContent = 'Editar Registro';
+                        editRecordId = id;
+                        currentImages = record.images ? [...record.images] : [];
+                        renderImagePreview();
+                        // Scroll al formulario se realiza en el evento del botón
+                    }
+                }
+
+                // Confirmar eliminación de un registro
+                function confirmDeleteRecord(id) {
+                    showConfirm('¿Estás seguro de que deseas eliminar este registro?', () => {
+                        deleteRecord(id);
+                        hideConfirm();
+                    });
+                }
+
+                // Eliminar un registro
+                function deleteRecord(id) {
+                    records = records.filter(record => record.id !== id);
+                    saveRecords();
+                    renderRecords();
+                }
+
+                // Resetear el formulario
+                function resetForm() {
+                    recordForm.reset();
+                    formTitleEl.textContent = 'Añadir Registro';
+                    editRecordId = null;
+                    currentImages = [];
+                    renderImagePreview();
+                }
+
+                // Generar un ID único
+                function generateId() {
+                    return '_' + Math.random().toString(36).substr(2, 9);
+                }
+
+                // Formatear la fecha
+                function formatDate(dateStr) {
+                    const [year, month, day] = dateStr.split('-');
+                    const date = new Date(year, month - 1, day);
+                    const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+                    return date.toLocaleDateString('es-ES', options);
+                }
+
+                // Mostrar alerta personalizada
+                function showAlert(message) {
+                    alertMessage.textContent = message;
+                    customAlert.classList.add('active');
+                }
+
+                // Ocultar alerta personalizada
+                function hideAlert() {
+                    customAlert.classList.remove('active');
+                }
+
+                // Mostrar confirmación personalizada
+                function showConfirm(message, callback) {
+                    confirmMessage.textContent = message;
+                    customConfirm.classList.add('active');
+                    confirmCallback = callback;
+                }
+
+                // Ocultar confirmación personalizada
+                function hideConfirm() {
+                    customConfirm.classList.remove('active');
+                    confirmCallback = null;
+                }
+
+                // Abrir el modal de imagen
+                function openImageModal(src) {
+                    fullImage.src = src;
+                    imageModal.classList.add('active');
+                }
+
+                // Cerrar el modal de imagen
+                function closeImageModal() {
+                    imageModal.classList.remove('active');
+                    fullImage.src = '';
+                }
+
+                // Mostrar vista previa de las imágenes
+                function renderImagePreview() {
+                    if (currentImages.length > 0) {
+                        imagePreviewContainer.style.display = 'block';
+                    } else {
+                        imagePreviewContainer.style.display = 'none';
+                    }
+
+                    previewImagesContainer.innerHTML = '';
+                    currentImages.forEach((imgSrc, index) => {
+                        const container = document.createElement('div');
+                        container.classList.add('preview-image-container');
+
+                        const img = document.createElement('img');
+                        img.src = imgSrc;
+                        img.alt = `Imagen ${index + 1}`;
+                        img.addEventListener('click', () => openImageModal(imgSrc));
+                        container.appendChild(img);
+
+                        const removeBtn = document.createElement('button');
+                        removeBtn.classList.add('remove-image');
+                        removeBtn.innerHTML = '&times;';
+                        removeBtn.title = 'Eliminar imagen';
+                        removeBtn.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Evita que se abra el modal de la imagen
+                            removeImage(index);
+                        });
+                        container.appendChild(removeBtn);
+
+                        previewImagesContainer.appendChild(container);
+                    });
+                }
+
+                // Eliminar una imagen de la vista previa
+                function removeImage(index) {
+                    currentImages.splice(index, 1);
+                    renderImagePreview();
+                }
+
+                // Manejar el cambio en la selección de imágenes usando Promesas para manejar múltiples archivos
+                recordImagesInput.addEventListener('change', async (e) => {
+                    const files = e.target.files;
+                    if (files && files.length > 0) {
+                        try {
+                            const imagePromises = Array.from(files).map(file => {
+                                return new Promise((resolve, reject) => {
+                                    const reader = new FileReader();
+                                    reader.onload = function(event) {
+                                        // Verificar si la imagen ya está en currentImages para evitar duplicados
+                                        if (!currentImages.includes(event.target.result)) {
+                                            resolve(event.target.result);
+                                        } else {
+                                            resolve(null); // Ignorar duplicados
+                                        }
+                                    };
+                                    reader.onerror = function() {
+                                        reject('Error al leer el archivo.');
+                                    };
+                                    reader.readAsDataURL(file);
+                                });
+                            });
+
+                            const images = await Promise.all(imagePromises);
+                            images.forEach(img => {
+                                if (img) currentImages.push(img);
+                            });
+                            renderImagePreview();
+                        } catch (error) {
+                            console.error(error);
+                            showAlert('Hubo un problema al cargar las imágenes.');
+                        }
+                    }
+                    // Reiniciar el input para permitir seleccionar las mismas imágenes nuevamente si se desea
+                    recordImagesInput.value = '';
+                });
+
+                // Manejar el envío del formulario
+                recordForm.addEventListener('submit', saveRecord);
+
+                // Manejar el botón de volver al calendario
+                backToCalendarBtn.addEventListener('click', () => {
+                    window.location.href = 'index.html';
+                });
+
+                // Manejar el botón de aceptar en la alerta
+                alertOkButton.addEventListener('click', hideAlert);
+
+                // Manejar los botones de confirmación
+                confirmYesButton.addEventListener('click', () => {
+                    if (typeof confirmCallback === 'function') confirmCallback();
+                });
+
+                confirmNoButton.addEventListener('click', hideConfirm);
+
+                // Cerrar el modal de imagen al hacer clic fuera de la imagen
+                imageModal.addEventListener('click', (e) => {
+                    if (e.target === imageModal) {
+                        closeImageModal();
+                    }
+                });
+
+                // Inicializar la vista
+                function init() {
+                    if (!selectedDate) {
+                        showAlert('No se ha seleccionado ninguna fecha.');
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 2000);
+                        return;
+                    }
+
+                    dayViewDateEl.textContent = formatDate(selectedDate);
+                    loadRecords();
+                    renderRecords();
+                    resetForm();
+                }
+
+                init();
+            });
+
+            // Variables para la confirmación
+            let confirmCallback = null;
+        })();
+    </script>
+</body>
+</html>
