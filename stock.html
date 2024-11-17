@@ -2,6 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <!-- Añadida la etiqueta meta viewport para la responsividad -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Actual - Calendario de Plantas</title>
     <style>
         /* Estilos CSS para stock.html */
@@ -17,6 +19,7 @@
             font-family: 'Arial', sans-serif;
             background-color: #f0f8ff;
             color: #333;
+            line-height: 1.6;
         }
 
         header, footer {
@@ -69,17 +72,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .stock-header h2 {
             color: #2e8b57;
+            font-size: 1.5em;
+            margin-bottom: 0.5em;
         }
 
         .add-seed-button {
             background-color: #2e8b57;
             color: white;
             border: none;
-            padding: 0.5em 1em;
+            padding: 0.75em 1.5em;
             border-radius: 5px;
             cursor: pointer;
             font-size: 1em;
@@ -87,6 +93,7 @@
             align-items: center;
             gap: 0.5em;
             transition: background-color 0.3s;
+            margin-top: 0.5em;
         }
 
         .add-seed-button:hover {
@@ -152,6 +159,8 @@
             border-radius: 5px;
             cursor: pointer;
             transition: transform 0.3s;
+            width: 100%;
+            height: auto;
         }
 
         .image-preview .preview-image-container img:hover {
@@ -200,12 +209,14 @@
             gap: 1em;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             position: relative;
+            flex-wrap: wrap;
         }
 
         .seed-images {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5em;
+            flex: 1 1 100%;
         }
 
         .seed-images img {
@@ -215,6 +226,8 @@
             border-radius: 5px;
             cursor: pointer;
             transition: transform 0.3s;
+            max-width: 100%;
+            height: auto;
         }
 
         .seed-images img:hover {
@@ -222,7 +235,8 @@
         }
 
         .seed-details {
-            flex: 1;
+            flex: 2;
+            min-width: 200px;
         }
 
         .seed-name {
@@ -235,6 +249,7 @@
         .seed-seasons {
             display: flex;
             gap: 0.5em;
+            flex-wrap: wrap;
         }
 
         .season {
@@ -278,6 +293,9 @@
         .action-buttons {
             display: flex;
             gap: 0.5em;
+            margin-top: 0.5em;
+            flex: 1 1 100%;
+            justify-content: flex-end;
         }
 
         .action-button {
@@ -339,6 +357,7 @@
         .modal-content h3 {
             margin-bottom: 1em;
             color: #2e8b57;
+            font-size: 1.5em;
         }
 
         .close-modal {
@@ -363,6 +382,7 @@
             display: flex;
             align-items: center;
             gap: 0.5em;
+            flex-wrap: wrap;
         }
 
         .modal-form input[type="text"],
@@ -423,29 +443,6 @@
 
         .modal-form button:hover {
             background-color: #246b45;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            main {
-                padding: 0.5em;
-            }
-
-            .seed-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .seed-images {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .action-buttons {
-                position: absolute;
-                top: 1em;
-                right: 1em;
-            }
         }
 
         /* Custom Alert and Confirm Modals */
@@ -551,6 +548,164 @@
             height: 24px;
         }
 
+        /* Responsive Design */
+
+        /* Extra Pequeños (móviles) */
+        @media (max-width: 575.98px) {
+            .stock-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .add-seed-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .seed-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .seed-details {
+                width: 100%;
+            }
+
+            .action-buttons {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .modal-content {
+                padding: 1.5em;
+            }
+
+            .modal-content h3 {
+                font-size: 1.3em;
+            }
+        }
+
+        /* Pequeños (tablets verticales) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .stock-header h2 {
+                font-size: 1.5em;
+            }
+
+            .add-seed-button {
+                padding: 0.75em 1.5em;
+                font-size: 1em;
+            }
+
+            .seed-name {
+                font-size: 1.2em;
+            }
+
+            .season-icon {
+                width: 20px;
+                height: 20px;
+            }
+
+            .action-button {
+                font-size: 1em;
+            }
+
+            .modal-content h3 {
+                font-size: 1.4em;
+            }
+        }
+
+        /* Medianos (tablets horizontales y laptops pequeñas) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .stock-header {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .add-seed-button {
+                margin-top: 0;
+            }
+
+            .seed-item {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .seed-images {
+                flex: 1;
+            }
+
+            .seed-details {
+                flex: 2;
+            }
+
+            .action-buttons {
+                flex: 1;
+                justify-content: flex-end;
+            }
+
+            .season-icon {
+                width: 24px;
+                height: 24px;
+            }
+        }
+
+        /* Grandes (desktops y laptops grandes) */
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            .stock-header h2 {
+                font-size: 1.8em;
+            }
+
+            .add-seed-button {
+                padding: 0.75em 1.5em;
+                font-size: 1.1em;
+            }
+
+            .seed-name {
+                font-size: 1.3em;
+            }
+
+            .season-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .action-button {
+                font-size: 1.2em;
+            }
+
+            .modal-content h3 {
+                font-size: 1.5em;
+            }
+        }
+
+        /* Extra Grandes (desktops muy grandes) */
+        @media (min-width: 1200px) {
+            .stock-header h2 {
+                font-size: 2em;
+            }
+
+            .add-seed-button {
+                padding: 0.75em 2em;
+                font-size: 1.2em;
+            }
+
+            .seed-name {
+                font-size: 1.4em;
+            }
+
+            .season-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .action-button {
+                font-size: 1.3em;
+            }
+
+            .modal-content h3 {
+                font-size: 1.6em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1081,4 +1236,3 @@
     </script>
 </body>
 </html>
-
